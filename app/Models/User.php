@@ -1,16 +1,12 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class User extends Model
 {
     protected $table = 'users';
-    protected $primaryKey = 'user_id';
 
     protected $fillable = [
         'role_id',
@@ -18,55 +14,38 @@ class User extends Authenticatable
         'email',
         'password_hash',
         'is_active',
-        'must_change_password',
+        'must_change_password'
     ];
 
-    protected $hidden = [
-        'password_hash',
-        'remember_token',
-    ];
+    protected $hidden = ['password_hash'];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'must_change_password' => 'boolean',
-    ];
-
-    /** AUTH */
-    public function getAuthPassword(): string
+    public function role()
     {
-        return (string) $this->password_hash;
+        return $this->belongsTo(Role::class);
     }
 
-    public function setPasswordAttribute($value): void
+    public function siswa()
     {
-        $this->attributes['password_hash'] = Hash::make($value);
+        return $this->hasOne(Siswa::class);
     }
 
-    /** RELASI */
-    public function role(): BelongsTo
+    public function guruBk()
     {
-        return $this->belongsTo(Role::class, 'role_id', 'role_id');
+        return $this->hasOne(GuruBk::class);
     }
 
-    public function siswa(): HasOne
+    public function admin()
     {
-        return $this->hasOne(Siswa::class, 'user_id', 'user_id');
+        return $this->hasOne(Admin::class);
     }
 
-    public function guruBk(): HasOne
+    public function uploads()
     {
-        return $this->hasOne(GuruBk::class, 'user_id', 'user_id');
+        return $this->hasMany(Upload::class, 'uploader_user_id');
     }
 
-    public function admin(): HasOne
+    public function activityLogs()
     {
-        return $this->hasOne(Admin::class, 'user_id', 'user_id');
-    }
-
-    // Tambahkan ini jika ingin fitur Activity Log berjalan
-    public function activityLogs(): HasMany
-    {
-        // Pastikan Anda sudah membuat model ActivityLog.php
-        return $this->hasMany(ActivityLogs::class, 'user_id', 'user_id');
+        return $this->hasMany(ActivityLog::class);
     }
 }

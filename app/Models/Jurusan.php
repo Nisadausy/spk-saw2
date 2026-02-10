@@ -3,23 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Jurusan extends Model
 {
     protected $table = 'jurusan';
-    protected $primaryKey = 'jurusan_id';
 
-    protected $fillable = [
-        'nama_jurusan',
-        'deskripsi',
-        'prospek_kerja',
-        'fasilitas_sekolah',
-        'is_active',
-    ];
+    protected $fillable = ['nama_jurusan', 'is_active'];
 
-    public function guruBk(): HasOne
+    public function guruBk()
     {
-        return $this->hasOne(GuruBk::class, 'jurusan_id', 'jurusan_id');
+        return $this->hasMany(GuruBk::class);
+    }
+
+    public function artikel()
+    {
+        return $this->hasMany(ArtikelJurusan::class);
+    }
+
+    public function informasi()
+    {
+        return $this->hasOne(InformasiJurusan::class);
+    }
+
+    public function prospekKerja()
+    {
+        return $this->hasMany(ProspekKerja::class);
     }
 }
