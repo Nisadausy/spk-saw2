@@ -13,16 +13,18 @@ class Siswa extends Model
         'sekolah_asal',
         'jenis_kelamin',
         'no_telepon',
-        'alamat'
+        'alamat',
     ];
+
+    // timestamps default true, cocok migration
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id'); // user_id -> users.id
     }
 
     public function tes()
     {
-        return $this->hasMany(Tes::class);
+        return $this->hasMany(Tes::class, 'siswa_id'); // siswa_id di tes -> siswa.id
     }
 }

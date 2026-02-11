@@ -10,8 +10,10 @@ class Role extends Model
 
     protected $fillable = ['nama_role'];
 
+    // timestamps default true, sudah cocok dengan migration
+
     public function users()
     {
-        return $this->hasMany(User::class);
-    } 
+        return $this->hasMany(User::class, 'role_id'); // role_id di users mengarah ke roles.id
+    }
 }
