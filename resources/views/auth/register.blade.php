@@ -146,7 +146,8 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('register.process') }}" novalidate>
+    {{-- ✅ Breeze: POST register adalah route('register') --}}
+    <form method="POST" action="{{ route('register') }}" novalidate>
         @csrf
 
         <div class="field">

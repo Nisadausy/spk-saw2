@@ -113,6 +113,7 @@
     <h2>Login</h2>
     <p>Silakan masuk menggunakan akun kamu</p>
 
+    {{-- Validasi Laravel (Breeze) --}}
     @if ($errors->any())
         <div class="alert alert-error">
             <ul style="margin:0; padding-left:18px;">
@@ -123,6 +124,7 @@
         </div>
     @endif
 
+    {{-- Flash message --}}
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -135,7 +137,8 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('login.process') }}" novalidate>
+    {{-- ✅ Breeze: POST login adalah route('login') --}}
+    <form method="POST" action="{{ route('login') }}" novalidate>
         @csrf
 
         <div class="field">

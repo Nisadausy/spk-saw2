@@ -90,20 +90,49 @@ class AuthController extends Controller
             return back()->withInput()->with('error', 'Akun tidak aktif. Hubungi admin.');
         }
 
-        // KUNCI: pastikan auth_user_id tidak null
+        // PK user aman untuk skema ERD (user_id) atau default (id)
         $userPk = $user->user_id ?? $user->id;
 
+        // Ambil nama role berdasarkan role_id (aman walau roles pk-nya id/role_id)
+        $roleName = DB::table('roles')
+            ->where(function ($q) use ($user) {
+                // bila tabel roles punya role_id (sesuai ERD)
+                if (DB::getSchemaBuilder()->hasColumn('roles', 'role_id')) {
+                    $q->where('role_id', $user->role_id);
+                } else {
+                    // fallback default migration pakai id
+                    $q->where('id', $user->role_id);
+                }
+            })
+            ->value('nama_role');
+
+        // Simpan session login (tetap gaya Anda, tidak pakai Auth::login)
         $request->session()->put([
             'auth_user_id' => $userPk,
             'auth_role_id' => $user->role_id,
+            'auth_role_name' => $roleName,      // tambahan agar mudah cek role di view/middleware
             'auth_user_name' => $user->nama,
         ]);
 
-        // Security: ganti session id setelah login
         $request->session()->regenerate();
 
-        return redirect()->route('home');
+        // ✅ Role-based redirect:
+        // - siswa -> home
+        // - admin -> dashboard admin
+        // - guru bk -> dashboard guru bk (placeholder route)
+        switch ($roleName) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+
+            case 'guru_bk':
+                return redirect()->route('bk.dashboard');
+
+            case 'siswa':
+            default:
+                return redirect()->route('home');
+        }
     }
+
 
     // =========================
     // LOGOUT
