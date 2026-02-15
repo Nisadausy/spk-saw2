@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,15 +14,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Jangan gunakan factory, karena model User Anda tidak memakai HasFactory.
+        // Fokus seeding sesuai kebutuhan sistem (admin tersedia sejak awal).
 
         $this->call([
-        AdminSeeder::class,
-    ]);
+            // Kalau Anda punya RoleSeeder, taruh di sini duluan:
+            // RoleSeeder::class,
+
+            AdminSeeder::class,
+        ]);
     }
 }

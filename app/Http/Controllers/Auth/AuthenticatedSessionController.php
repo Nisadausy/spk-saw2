@@ -25,29 +25,26 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // Breeze authenticate (akan pakai password_hash karena model User Anda sudah override getAuthPasswordName())
         $request->authenticate();
-
         $request->session()->regenerate();
 
         $user = Auth::user();
 
-        // Ambil nama role berdasarkan role_id pada users (aman untuk roles PK id / role_id)
+        if (!$user) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login');
+        }
+
+        // roles PK = id (sesuai migration kamu)
         $roleName = DB::table('roles')
-            ->where(function ($q) use ($user) {
-                if (DB::getSchemaBuilder()->hasColumn('roles', 'role_id')) {
-                    $q->where('role_id', $user->role_id);
-                } else {
-                    $q->where('id', $user->role_id);
-                }
-            })
+            ->where('id', $user->role_id)
             ->value('nama_role');
 
-        // Redirect sesuai role:
-        // - siswa => home (dashboard siswa)
-        // - admin => admin.dashboard
-        // - guru_bk => bk.dashboard
-        // Fallback: dashboard default
+        $roleName = strtolower(trim((string) $roleName));
+
         if ($roleName === 'admin') {
             return redirect()->route('admin.dashboard');
         }
@@ -56,9 +53,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('bk.dashboard');
         }
 
-        // Default siswa
-        return redirect()->route('home');
+        return redirect()->route('home'); // siswa
     }
+
 
     /**
      * Destroy an authenticated session.
